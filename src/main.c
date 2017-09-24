@@ -1,10 +1,12 @@
 #include <glib.h>
 #include <gio/gio.h>
 
-#include "agent.h"
-#include "utils.h"
-#include "a2dp-endpoint.h"
 #include "bluez-interface.h"
+#include "utils.h"
+#include "adapter.h"
+#include "agent.h"
+#include "a2dp-endpoint.h"
+#include "device.h"
 
 #define A2DP_SBC_SINK_ENDPOINT      "/MediaEndpoint/SBC/Sink"
 
@@ -17,6 +19,18 @@ static void interface_added(GDBusConnection *conn,
                    G_VARIANT_TYPE_DICTIONARY)) {
         DEBUG_INFO("AgentManager1 interface found\n");
         register_agent (conn, "NoInputNoOutput");
+    }
+
+    if (g_variant_lookup_value(variant, ADAPTER_INTERFACE,
+			       G_VARIANT_TYPE_DICTIONARY)) {
+	    DEBUG_INFO ("Adapter1 interface found\n");
+	    adapter_added (path);
+    }
+
+    if (g_variant_lookup_value(variant, DEVICE_INTERFACE,
+			       G_VARIANT_TYPE_DICTIONARY)) {
+	    DEBUG_INFO ("Device1 interface found\n");
+	    device_added (path);
     }
 
     if (g_variant_lookup_value(variant, MEDIA_INTERFACE,

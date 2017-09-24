@@ -6,7 +6,7 @@ if(ENABLE_DEBUG)
     set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -DDEBUG")
 endif()
 
-set(SOURCE_FILES agent.c a2dp-endpoint.c main.c)
+set(SOURCE_FILES agent.c a2dp-endpoint.c adapter.c device.c main.c)
 
 include_directories (${GLIB_INCLUDE_DIRS} ${GIO_INCLUDE_DIRS})
 link_directories (${GLIB_LIBRARY_DIRS} ${GIO_LIBRARY_DIRS})
