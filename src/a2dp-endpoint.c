@@ -64,8 +64,17 @@ static void handle_method_call (GDBusConnection * conn,
 
 	} else if (g_strcmp0(method, "SetConfiguration") == 0) {
 
-        g_dbus_method_invocation_return_value (invocation, NULL);
+        GVariant *params = g_dbus_method_invocation_get_parameters (invocation);
+        const char *transport;
+        GVariantIter *properties;
 
+        g_variant_get (params, "(&oa{sv})", &transport, &properties);
+        DEBUG_INFO ("Transport: %s\n", transport);
+
+        // TODO: Properties will contain capabilities
+        //DEBUG_INFO ("Properties: %s\n", g_variant_print(params, TRUE));
+
+        g_dbus_method_invocation_return_value (invocation, NULL);
     } else if (g_strcmp0(method, "ClearConfiguration") == 0) {
 
         g_dbus_method_invocation_return_value (invocation, NULL);
