@@ -1,5 +1,6 @@
 #include <glib.h>
 #include <gio/gio.h>
+#include <gst/gst.h>
 
 #include "bluez-interface.h"
 #include "utils.h"
@@ -7,38 +8,46 @@
 #include "agent.h"
 #include "a2dp-endpoint.h"
 #include "device.h"
+#include "media-transport.h"
 
 #define A2DP_SBC_SINK_ENDPOINT      "/MediaEndpoint/SBC/Sink"
 
 static void interface_added(GDBusConnection *conn,
                             const char *path,
                             GVariant *variant) {
-    //DEBUG_INFO("interface: %s, path: %s\n", g_variant_print(variant, TRUE), path);
+	//DEBUG_INFO("interface: %s, path: %s\n", g_variant_print(variant, TRUE), path);
 
-    if (g_variant_lookup_value(variant, AGENT_MANAGER,
-                   G_VARIANT_TYPE_DICTIONARY)) {
-        DEBUG_INFO("AgentManager1 interface found\n");
-        register_agent (conn, "NoInputNoOutput");
-    }
+	if (g_variant_lookup_value(variant, AGENT_MANAGER,
+				   G_VARIANT_TYPE_DICTIONARY)) {
+		DEBUG_INFO("AgentManager1 interface found\n");
+		register_agent(conn, "NoInputNoOutput");
+	}
 
-    if (g_variant_lookup_value(variant, ADAPTER_INTERFACE,
-			       G_VARIANT_TYPE_DICTIONARY)) {
-	    DEBUG_INFO ("Adapter1 interface found\n");
-	    adapter_added (path);
-    }
+	if (g_variant_lookup_value(variant, ADAPTER_INTERFACE,
+				   G_VARIANT_TYPE_DICTIONARY)) {
+		DEBUG_INFO("Adapter1 interface found\n");
+		adapter_added(path);
+	}
 
-    if (g_variant_lookup_value(variant, DEVICE_INTERFACE,
-			       G_VARIANT_TYPE_DICTIONARY)) {
-	    DEBUG_INFO ("Device1 interface found\n");
-	    device_added (path);
-    }
+	if (g_variant_lookup_value(variant, DEVICE_INTERFACE,
+				   G_VARIANT_TYPE_DICTIONARY)) {
+		DEBUG_INFO("Device1 interface found\n");
+		device_added(path);
+	}
 
-    if (g_variant_lookup_value(variant, MEDIA_INTERFACE,
-                   G_VARIANT_TYPE_DICTIONARY)) {
-        DEBUG_INFO("Media1 interface found\n");
-        register_a2dp_endpoint (conn, path, SINK, A2DP_SBC_SINK_ENDPOINT);
-    }
+	if (g_variant_lookup_value(variant, MEDIA_INTERFACE,
+				   G_VARIANT_TYPE_DICTIONARY)) {
+		DEBUG_INFO("Media1 interface found\n");
+		register_a2dp_endpoint(conn, path, SINK, A2DP_SBC_SINK_ENDPOINT);
+	}
+
+	if (g_variant_lookup_value(variant, MEDIATRANSPORT_INTERFACE,
+				   G_VARIANT_TYPE_DICTIONARY)) {
+		DEBUG_INFO("MediaTransport1 interface found\n");
+		media_transport_added(path);
+	}
 }
+
 
 static void interface_removed(GDBusConnection * conn,
 			                  const char *path,
@@ -143,7 +152,9 @@ static void bluez_vanished_cb(GDBusConnection *connection,
     deregister_agent ();
 }
 
-int main() {
+int main(int argc, char *argv[]) {
+    gst_init( &argc, &argv );
+
     guint owner_change_id = g_bus_watch_name(G_BUS_TYPE_SYSTEM,
                          BLUEZ_SERVICE,
                          G_BUS_NAME_WATCHER_FLAGS_NONE,
