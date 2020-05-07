@@ -86,8 +86,8 @@ gboolean media_transport_added(const gchar *path) {
 	g_signal_connect(G_OBJECT(mediatransport1), "g-signal", G_CALLBACK(on_signal),
 			 NULL);
 
-	gchar *str = g_strdup_printf("avdtpsrc transport=%s ! decodebin ! alsasink device=\"hw:0,0\"", path);
-	//g_print("%s\n", str);
+	gchar *str = g_strdup_printf("avdtpsrc transport=%s ! rtpsbcdepay ! sbcparse ! sbcdec ! queue ! autoaudiosink", path);
+	g_print("%s\n", str);
 	pipeline = gst_parse_launch(str, NULL);
 	GstBus *bus = gst_pipeline_get_bus(GST_PIPELINE(pipeline));
 	gst_bus_add_watch(bus, bus_message, pipeline);

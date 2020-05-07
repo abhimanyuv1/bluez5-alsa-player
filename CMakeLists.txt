@@ -1,5 +1,7 @@
 cmake_minimum_required(VERSION 2.8)
 
+project(bluez-alsa)
+
 option(ENABLE_DEBUG "Enable debug build" ON)
 set(CMAKE_BUILD_TYPE Release)
 
